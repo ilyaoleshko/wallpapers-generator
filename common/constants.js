@@ -26,10 +26,6 @@ export const translations =
         confirm: "Confirm",
       };
 
-export const colors = {
-  navigationText: "#3d3d4e",
-};
-
 export const wallpaperConfig = {
   result: "tmpfile",
   quality: 1,

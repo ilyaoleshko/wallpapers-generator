@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  StyleSheet,
-  View,
-  ImageBackground,
   Dimensions,
+  ImageBackground,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
@@ -13,19 +12,20 @@ import { AntDesign } from "@expo/vector-icons";
 import ReactNativePickerModule from "react-native-picker-module";
 import Slider from "@react-native-community/slider";
 
-import Navigation from "../components/Navigation";
+import Backdrop from "../components/Backdrop";
 import Button from "../components/Button";
 import Calendar from "../components/Calendar";
-import Backdrop from "../components/Backdrop";
+import Navigation from "../components/Navigation";
 
 import {
-  wallpaperConfig,
-  pickerOptions,
-  getMonthsArray,
-  translations,
-  colors,
   getDefaultImage,
+  getMonthsArray,
+  pickerOptions,
+  translations,
+  wallpaperConfig,
 } from "../common/constants";
+
+import { styles, colors } from "../common/styles";
 
 const Home = () => {
   const wallpaperRef = useRef(null);
@@ -39,12 +39,15 @@ const Home = () => {
 
   const defaultImage = getDefaultImage(rescaledDim.width, rescaledDim.height);
   const months = getMonthsArray();
-  const currentDate = new Date().getMonth() + 1;
+  const currentDate = new Date().getMonth();
 
   const [month, setMonth] = useState(currentDate);
   const [wallpaper, setWallpaper] = useState(defaultImage);
   const [opacity, setBackdropOpacity] = useState(0.15);
   const [displaySettings, setDisplaySettings] = useState(false);
+
+  const settingsImage = displaySettings ? "down" : "setting";
+  const userMonthValue = month + 1 + "";
 
   useEffect(() => {
     async () => {
@@ -57,7 +60,7 @@ const Home = () => {
   }, []);
 
   const onSelectWallpaper = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
+    const result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
 
     if (!result.cancelled) {
       setWallpaper(result.uri);
@@ -69,7 +72,7 @@ const Home = () => {
   };
 
   const onDownloadWallpaper = async () => {
-    let wallpaper = await captureRef(wallpaperRef, wallpaperConfig);
+    const wallpaper = await captureRef(wallpaperRef, wallpaperConfig);
 
     MediaLibrary.saveToLibraryAsync(wallpaper);
   };
@@ -84,7 +87,7 @@ const Home = () => {
   const onOpenPicker = () => pickerRef.current.show();
 
   const onSelectMonth = (value) => {
-    setMonth(value);
+    setMonth(value - 1);
     onHideSettings();
   };
 
@@ -107,33 +110,33 @@ const Home = () => {
           </ImageBackground>
         </View>
       </TouchableWithoutFeedback>
-
       <Navigation>
         <Button onPress={onSelectWallpaper}>
-          <AntDesign name="picture" size={24} color={colors.navigationText} />
+          <AntDesign name="picture" size={24} color={colors.actionText} />
         </Button>
         <Button onPress={onDownloadWallpaper}>
-          <AntDesign name="download" size={24} color={colors.navigationText} />
+          <AntDesign name="download" size={24} color={colors.actionText} />
         </Button>
         <Button onPress={onUpdateWallpaper}>
-          <AntDesign name="reload1" size={24} color={colors.navigationText} />
+          <AntDesign name="reload1" size={24} color={colors.actionText} />
         </Button>
         <Button onPress={onSettings}>
-          <AntDesign
-            name={displaySettings ? "down" : "setting"}
-            size={24}
-            color={colors.navigationText}
-          />
+          <AntDesign name={settingsImage} size={24} color={colors.actionText} />
         </Button>
       </Navigation>
       {displaySettings && (
         <Navigation advancedContainerStyle={styles.settingsContainer}>
+          <ReactNativePickerModule
+            pickerRef={pickerRef}
+            value={userMonthValue}
+            title={translations.selectorTitle}
+            cancelButton={translations.cancel}
+            confirmButton={translations.confirm}
+            items={months}
+            onValueChange={onSelectMonth}
+          />
           <Button onPress={onOpenPicker}>
-            <AntDesign
-              name="calendar"
-              size={24}
-              color={colors.navigationText}
-            />
+            <AntDesign name="calendar" size={24} color={colors.actionText} />
           </Button>
           <Button onPress={onRestOpacity}>
             <Slider
@@ -141,49 +144,14 @@ const Home = () => {
               minimumValue={0.0}
               value={opacity}
               maximumValue={1.0}
-              minimumTrackTintColor={colors.navigationText}
+              minimumTrackTintColor={colors.actionText}
               onValueChange={setBackdropOpacity}
             />
           </Button>
         </Navigation>
       )}
-      <ReactNativePickerModule
-        pickerRef={pickerRef}
-        value={month}
-        title={translations.selectorTitle}
-        cancelButton={translations.cancel}
-        confirmButton={translations.confirm}
-        items={months}
-        onValueChange={onSelectMonth}
-      />
     </View>
   );
 };
 
 export default Home;
-
-const styles = StyleSheet.create({
-  slider: {
-    width: 200,
-    flex: 1,
-  },
-  settingsContainer: {
-    zIndex: 9,
-    height: 220,
-  },
-  container: {
-    flex: 1,
-    flexDirection: "column",
-  },
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  debug: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "white",
-  },
-});

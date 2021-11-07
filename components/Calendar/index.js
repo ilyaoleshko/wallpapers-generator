@@ -1,24 +1,28 @@
-import React from "react";
-import moment from "moment";
-import "moment/locale/ru";
-import { StyleSheet, View, Text } from "react-native";
+import dayjs from "dayjs";
+import "dayjs/locale/ru";
+import { View, Text } from "react-native";
 import { toUpper, shortLocale, convertToMatrix } from "../../common/constants";
+import { styles } from "../../common/styles";
+
+const localeData = require("dayjs/plugin/localeData");
+
+dayjs.extend(localeData);
+dayjs().localeData();
+dayjs.locale(shortLocale);
 
 const Calendar = ({ selectedMonth }) => {
-  moment.locale(shortLocale);
-
-  const month = selectedMonth ? moment(selectedMonth, "MM") : moment();
+  const month = selectedMonth ? dayjs().month(selectedMonth) : dayjs();
   const monthName = toUpper(month.format("MMMM"));
-  const weekDays = moment.weekdaysShort(true);
+  const weekDays = dayjs.weekdaysMin();
 
   const calendarDays = {
-    first: month.clone().startOf("month").startOf("week").date(),
-    last: month.clone().endOf("month").date(),
+    first: month.startOf("M").startOf("w").date(),
+    last: month.endOf("M").date(),
   };
 
   const monthDays = {
-    lastPrevious: month.clone().subtract(1, "months").endOf("month").date(),
-    lastCurrent: month.clone().endOf("month").date(),
+    lastPrevious: month.subtract(1, "M").endOf("M").date(),
+    lastCurrent: month.endOf("M").date(),
   };
 
   const createCalendarArray = () => {
@@ -34,18 +38,18 @@ const Calendar = ({ selectedMonth }) => {
         day <= monthDays.lastPrevious;
         index++
       ) {
-        calendar.push([day++, true]);
+        calendar[index] = [day++, true];
       }
     }
 
     for (let day = 1; index <= maxDays; index++) {
       if (day > monthDays.lastCurrent) {
-        calendar.push([nextDay++, true]);
+        calendar[index] = [nextDay++, true];
         isNextMonth = true;
       }
 
       if (!isNextMonth) {
-        calendar.push([day++, false]);
+        calendar[index] = [day++, false];
       }
     }
 
@@ -76,7 +80,7 @@ const Calendar = ({ selectedMonth }) => {
   ));
 
   return (
-    <View style={styles.container}>
+    <View style={styles.calendarContainer}>
       <Text style={styles.month}>{monthName}</Text>
       <View style={styles.head}>{head}</View>
       {weeks}
@@ -85,54 +89,3 @@ const Calendar = ({ selectedMonth }) => {
 };
 
 export default Calendar;
-
-const styles = StyleSheet.create({
-  container: {
-    zIndex: 11,
-  },
-  text: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "white",
-  },
-  month: {
-    alignSelf: "center",
-    fontSize: 40,
-    fontStyle: "normal",
-    fontWeight: "700",
-    lineHeight: 60,
-    letterSpacing: 0,
-    color: "#ffffff",
-    marginBottom: 18,
-  },
-  head: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ffffff",
-    paddingBottom: 8,
-    marginBottom: 8,
-  },
-  headDay: {
-    fontSize: 26,
-    fontStyle: "normal",
-    width: 36,
-    fontWeight: "700",
-    color: "#ffffff",
-    textAlign: "center",
-  },
-  week: {
-    flexDirection: "row",
-    paddingVertical: 4,
-  },
-  day: {
-    fontSize: 26,
-    fontStyle: "normal",
-    width: 36,
-    fontWeight: "700",
-    color: "#ffffff",
-    textAlign: "center",
-  },
-  dayGlass: {
-    color: "rgba(255, 255, 255, 0.3)",
-  },
-});

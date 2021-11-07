@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
+import { styles } from "../../common/styles";
 
 const Backdrop = ({ opacity = "0.15" }) => {
   return (
@@ -13,12 +13,3 @@ const Backdrop = ({ opacity = "0.15" }) => {
 };
 
 export default Backdrop;
-
-const styles = StyleSheet.create({
-  backdrop: {
-    width: 750,
-    height: 1334,
-    position: "absolute",
-    zIndex: 10,
-  },
-});
