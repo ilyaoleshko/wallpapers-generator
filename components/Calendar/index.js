@@ -10,10 +10,15 @@ dayjs.extend(localeData);
 dayjs().localeData();
 dayjs.locale(shortLocale);
 
-const Calendar = ({ selectedMonth }) => {
+const Calendar = ({
+  selectedMonth,
+  advancedStyleDay,
+  advancedStyleHeadDay,
+  advancedStyleContainer,
+}) => {
   const month = selectedMonth ? dayjs().month(selectedMonth) : dayjs();
   const monthName = toUpper(month.format("MMMM"));
-  const weekDays = dayjs.weekdaysMin();
+  const weekDays = dayjs.weekdaysMin(true);
 
   const calendarDays = {
     first: month.startOf("M").startOf("w").date(),
@@ -63,7 +68,10 @@ const Calendar = ({ selectedMonth }) => {
     return [...Array(calendar.length).keys()].map((week, index) => (
       <View key={week} style={styles.week}>
         {calendar[index].map((day) => (
-          <Text style={[styles.day, day[1] && styles.dayGlass]} key={day}>
+          <Text
+            style={[styles.day, day[1] && styles.dayGlass, advancedStyleDay]}
+            key={day}
+          >
             {day}
           </Text>
         ))}
@@ -74,13 +82,13 @@ const Calendar = ({ selectedMonth }) => {
   const weeks = drawWeeks();
 
   const head = weekDays.map((x) => (
-    <Text key={x} style={styles.headDay}>
+    <Text key={x} style={[styles.headDay, advancedStyleHeadDay]}>
       {toUpper(x)}
     </Text>
   ));
 
   return (
-    <View style={styles.calendarContainer}>
+    <View style={[styles.calendarContainer, advancedStyleContainer]}>
       <Text style={styles.month}>{monthName}</Text>
       <View style={styles.head}>{head}</View>
       {weeks}

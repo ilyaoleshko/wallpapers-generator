@@ -95,6 +95,16 @@ const Home = () => {
 
   const onLoadingError = () => onUpdateWallpaper();
 
+  let calendarTextStyle = null;
+  let calendarContainerStyle = null;
+  let navigationContainerStyle = null;
+
+  if (rescaledDim.height <= 2300) {
+    calendarTextStyle = { fontSize: 24, width: 40 };
+    calendarContainerStyle = { paddingTop: 100 };
+    navigationContainerStyle = { paddingBottom: 0, height: 100 };
+  }
+
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={onHideSettings}>
@@ -106,11 +116,16 @@ const Home = () => {
             onError={onLoadingError}
           >
             <Backdrop opacity={opacity} />
-            <Calendar selectedMonth={month} />
+            <Calendar
+              selectedMonth={month}
+              advancedStyleDay={calendarTextStyle}
+              advancedStyleHeadDay={calendarTextStyle}
+              advancedStyleContainer={calendarContainerStyle}
+            />
           </ImageBackground>
         </View>
       </TouchableWithoutFeedback>
-      <Navigation>
+      <Navigation advancedContainerStyle={navigationContainerStyle}>
         <Button onPress={onSelectWallpaper}>
           <AntDesign name="picture" size={24} color={colors.actionText} />
         </Button>
